@@ -739,58 +739,61 @@ public class ExcelExporter extends Exporter {
             for (final UIComponent component : table.getChildren()) {
                 if (component instanceof RowExpansion) {
                     final RowExpansion rowExpansion = (RowExpansion) component;
-                    if (rowExpansion.getChildren() != null) {
-                        if (rowExpansion.getChildren().get(0) instanceof DataTable) {
-                            final DataTable childTable = (DataTable) rowExpansion.getChildren().get(0);
-                            childTable.setRowIndex(-1);
-                        }
-                        if (rowExpansion.getChildren().get(0) instanceof DataList) {
-                            final DataList childList = (DataList) rowExpansion.getChildren().get(0);
-                            childList.setRowIndex(-1);
+                    if (rowExpansion.isRendered()) {
+                        if (rowExpansion.getChildren() != null) {
+                            if (rowExpansion.getChildren().get(0) instanceof DataTable) {
+                                final DataTable childTable = (DataTable) rowExpansion.getChildren().get(0);
+                                childTable.setRowIndex(-1);
+                            }
+                            if (rowExpansion.getChildren().get(0) instanceof DataList) {
+                                final DataList childList = (DataList) rowExpansion.getChildren().get(0);
+                                childList.setRowIndex(-1);
+                            }
                         }
                     }
-
                 }
             }
         }
         for (final UIComponent component : table.getChildren()) {
             if (component instanceof RowExpansion) {
                 final RowExpansion rowExpansion = (RowExpansion) component;
-                if (rowExpansion.getChildren() != null) {
-                    for (int i = 0; i < rowExpansion.getChildren().size(); i++) {
-                        final UIComponent child = rowExpansion.getChildren().get(i);
-                        if (child instanceof DataList) {
-                            final DataList list = (DataList) child;
-                            if (list.getHeader() != null) {
-                                tableFacet(context, sheet, list, "header");
-                            }
-                            exportAll(context, list, sheet);
-                        }
-                    }
-                    for (int i = 0; i < rowExpansion.getChildren().size(); i++) {
-                        if (rowExpansion.getChildren().get(i) instanceof DataTable) {
-                            final DataTable childTable = (DataTable) rowExpansion.getChildren().get(i);
-                            final int columnsCount = getColumnsCount(childTable);
-                            if (columnsCount > 0) { // In case none of the colums are exportable.
-                                if (childTable.getHeader() != null) {
-                                    tableFacet(context, sheet, childTable, columnsCount, "header");
-
+                if (rowExpansion.isRendered()) {
+                    if (rowExpansion.getChildren() != null) {
+                        for (int i = 0; i < rowExpansion.getChildren().size(); i++) {
+                            final UIComponent child = rowExpansion.getChildren().get(i);
+                            if (child instanceof DataList) {
+                                final DataList list = (DataList) child;
+                                if (list.getHeader() != null) {
+                                    tableFacet(context, sheet, list, "header");
                                 }
-                                tableColumnGroup(sheet, childTable, "header");
-
-                                addColumnFacets(childTable, sheet, ColumnType.HEADER);
-
-                                exportAll(context, childTable, sheet, false);
-
-                                if (childTable.hasFooterColumn()) {
-                                    addColumnFacets(childTable, sheet, ColumnType.FOOTER);
-                                }
-                                tableColumnGroup(sheet, childTable, "footer");
-                                childTable.setRowIndex(-1);
+                                exportAll(context, list, sheet);
                             }
                         }
-                    }
+                        for (int i = 0; i < rowExpansion.getChildren().size(); i++) {
+                            if (rowExpansion.getChildren().get(i) instanceof DataTable) {
+                                final DataTable childTable = (DataTable) rowExpansion.getChildren().get(i);
+                                final int columnsCount = getColumnsCount(childTable);
+                                if (columnsCount > 0) { // In case none of the colums are exportable.
+                                    if (childTable.getHeader() != null) {
+                                        tableFacet(context, sheet, childTable, columnsCount, "header");
 
+                                    }
+                                    tableColumnGroup(sheet, childTable, "header");
+
+                                    addColumnFacets(childTable, sheet, ColumnType.HEADER);
+
+                                    exportAll(context, childTable, sheet, false);
+
+                                    if (childTable.hasFooterColumn()) {
+                                        addColumnFacets(childTable, sheet, ColumnType.FOOTER);
+                                    }
+                                    tableColumnGroup(sheet, childTable, "footer");
+                                    childTable.setRowIndex(-1);
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
         }
